@@ -1,0 +1,4 @@
+**/bin
+**/obj
+**/target
+src/rust_core/Cargo.lock

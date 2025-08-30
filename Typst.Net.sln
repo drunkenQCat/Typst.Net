@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{897C3153-DEE1-48C5-9070-3D2664302BFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typst.Net", "src\Typst.Net\Typst.Net.csproj", "{49CC665E-0735-49EE-B895-C58BF173EC1D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{50995253-6707-4E6F-BA3A-697E6884381D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typst.Net.Tests", "tests\Typst.Net.Tests\Typst.Net.Tests.csproj", "{0A2EBE77-741E-418D-BE4A-87762B809F2F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49CC665E-0735-49EE-B895-C58BF173EC1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49CC665E-0735-49EE-B895-C58BF173EC1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49CC665E-0735-49EE-B895-C58BF173EC1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49CC665E-0735-49EE-B895-C58BF173EC1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A2EBE77-741E-418D-BE4A-87762B809F2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A2EBE77-741E-418D-BE4A-87762B809F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A2EBE77-741E-418D-BE4A-87762B809F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A2EBE77-741E-418D-BE4A-87762B809F2F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{49CC665E-0735-49EE-B895-C58BF173EC1D} = {897C3153-DEE1-48C5-9070-3D2664302BFC}
+		{0A2EBE77-741E-418D-BE4A-87762B809F2F} = {50995253-6707-4E6F-BA3A-697E6884381D}
+	EndGlobalSection
+EndGlobal

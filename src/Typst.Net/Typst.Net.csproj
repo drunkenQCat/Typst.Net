@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- NuGet Package Properties -->
+    <PackageId>Typst.Net</PackageId>
+    <Version>0.1.0-typst0.13.1</Version>
+    <Authors>Typst.Net Contributors</Authors>
+    <Description>A .NET wrapper for the Typst typesetting system.</Description>
+    <PackageTags>typst;typesetting;pdf;rust</PackageTags>
+    <RepositoryUrl>https://github.com/messense/typst-py</RepositoryUrl> <!-- Placeholder URL -->
+
+  </PropertyGroup>
+
+  <!-- This section ensures the native library is included in the NuGet package -->
+  <ItemGroup>
+    <Content Include="..\rust_core\target\release\rust_core.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\win-x64\native\</PackagePath>
+    </Content>
+    <!-- Add other platforms here, e.g., linux-x64, osx-x64 -->
+    <!--
+    <Content Include="..\rust_core\target\release\librust_core.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\linux-x64\native\</PackagePath>
+    </Content>
+    -->
+  </ItemGroup>
+
+  <Target Name="BuildRust" BeforeTargets="BeforeBuild">
+    <Message Text="Building Rust code..." Importance="high" />
+    <Exec Command="cargo build --release --manifest-path ../rust_core/Cargo.toml" />
+  </Target>
+
+  <!-- This target is for local development and testing, not for the package -->
+  <Target Name="CopyNativeAssetsForLocalDev" AfterTargets="BuildRust">
+    <Message Text="Copying native assets for local development..." Importance="high" />
+    <Copy SourceFiles="../rust_core/target/release/rust_core.dll" DestinationFolder="$(OutDir)" />
+  </Target>
+
+</Project>
