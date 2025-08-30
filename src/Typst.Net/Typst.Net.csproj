@@ -8,13 +8,19 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>Typst.Net</PackageId>
-    <Version>0.1.0-typst0.13.1</Version>
+    <Version>0.1.1-typst0.13.1</Version>
     <Authors>Typst.Net Contributors</Authors>
     <Description>A .NET wrapper for the Typst typesetting system.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>typst;typesetting;pdf;rust</PackageTags>
-    <RepositoryUrl>https://github.com/messense/typst-py</RepositoryUrl> <!-- Placeholder URL -->
+    <RepositoryUrl>https://github.com/drunkenQCat/Typst.Net</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
   <!-- This section ensures the native library is included in the NuGet package -->
   <ItemGroup>
