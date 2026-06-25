@@ -76,9 +76,28 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Extract version from tag
+        id: version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -match '^refs/tags/v(.+)$') {
+            $version = $Matches[1]
+            Write-Host "Tag version: $version"
+            echo "version=$version" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "Not a tag push, using csproj version"
+            echo "version=" >> $env:GITHUB_OUTPUT
+          }
+
       - name: Pack
         working-directory: src/Typst.Net
-        run: dotnet pack -c Release -o ../../nupkg
+        run: |
+          if ("${{ steps.version.outputs.version }}" -ne "") {
+            dotnet pack -c Release -o ../../nupkg /p:Version=${{ steps.version.outputs.version }}
+          } else {
+            dotnet pack -c Release -o ../../nupkg
+          }
+        shell: pwsh
 
       - name: Upload .nupkg artifact
         uses: actions/upload-artifact@v4
