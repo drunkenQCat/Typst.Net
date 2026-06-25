@@ -1,0 +1,107 @@
+name: CI / Publish
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Push NuGet package to nuget.org"
+        type: boolean
+        default: false
+
+jobs:
+  build-test:
+    name: Build & Test (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Rust ──
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src/rust_core
+
+      - name: Build Rust native library
+        working-directory: src/rust_core
+        run: cargo build --release
+
+      - name: Upload rust_core.dll artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust_core_dll
+          path: src/rust_core/target/release/rust_core.dll
+
+      # ── .NET ──
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore NuGet packages
+        working-directory: src/Typst.Net
+        run: dotnet restore
+
+      - name: Build .NET project
+        working-directory: src/Typst.Net
+        run: dotnet build -c Release --no-restore
+
+      # ── Tests ──
+      - name: Run tests
+        working-directory: tests/Typst.Net.Tests
+        run: dotnet test -c Release
+
+  pack:
+    name: Pack NuGet
+    needs: build-test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download rust_core.dll
+        uses: actions/download-artifact@v4
+        with:
+          name: rust_core_dll
+          path: src/rust_core/target/release/
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Pack
+        working-directory: src/Typst.Net
+        run: dotnet pack -c Release -o ../../nupkg
+
+      - name: Upload .nupkg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: nupkg/*.nupkg
+
+  publish:
+    name: Publish to NuGet
+    needs: pack
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download .nupkg
+        uses: actions/download-artifact@v4
+        with:
+          name: nupkg
+          path: nupkg/
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Push to nuget.org
+        run: dotnet nuget push nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
