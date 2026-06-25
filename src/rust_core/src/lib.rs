@@ -55,6 +55,7 @@ pub extern "C" fn create_compiler(
     font_paths_len: usize,
     sys_inputs: *const c_char,
     ignore_system_fonts: bool,
+    root: *const c_char,
 ) -> *mut Compiler {
     let input_str = unsafe { CStr::from_ptr(input).to_str().unwrap_or("") };
     let sys_inputs_str = unsafe { CStr::from_ptr(sys_inputs).to_str().unwrap_or("{}") };
@@ -68,8 +69,12 @@ pub extern "C" fn create_compiler(
 
     let inputs: Dict = serde_json::from_str(sys_inputs_str).unwrap_or_default();
 
-    let root = std::path::PathBuf::from(".");
-    match SystemWorld::new(root, &font_paths_vec, inputs, input_str, !ignore_system_fonts) {
+    let root_path = if root.is_null() {
+        std::path::PathBuf::from(".")
+    } else {
+        PathBuf::from(unsafe { CStr::from_ptr(root).to_str().unwrap_or(".") })
+    };
+    match SystemWorld::new(root_path, &font_paths_vec, inputs, input_str, !ignore_system_fonts) {
         Ok(world) => Box::into_raw(Box::new(Compiler(world))),
         Err(_) => ptr::null_mut(),
     }

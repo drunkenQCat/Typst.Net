@@ -8,7 +8,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>Typst.Net</PackageId>
-    <Version>0.1.2-typst0.13.1</Version>
+    <Version>0.1.3-typst0.13.1</Version>
     <Authors>Typst.Net Contributors</Authors>
     <Description>A .NET wrapper for the Typst typesetting system.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -37,13 +37,13 @@
     -->
   </ItemGroup>
 
-  <Target Name="BuildRust" BeforeTargets="BeforeBuild">
+  <Target Name="BuildRust" BeforeTargets="BeforeBuild" Condition="'$(SkipRustBuild)' != 'true'">
     <Message Text="Building Rust code..." Importance="high" />
     <Exec Command="cargo build --release --manifest-path ../rust_core/Cargo.toml" />
   </Target>
 
   <!-- This target is for local development and testing, not for the package -->
-  <Target Name="CopyNativeAssetsForLocalDev" AfterTargets="BuildRust">
+  <Target Name="CopyNativeAssetsForLocalDev" AfterTargets="BuildRust" Condition="'$(SkipRustBuild)' != 'true'">
     <Message Text="Copying native assets for local development..." Importance="high" />
     <Copy SourceFiles="../rust_core/target/release/rust_core.dll" DestinationFolder="$(OutDir)" />
   </Target>

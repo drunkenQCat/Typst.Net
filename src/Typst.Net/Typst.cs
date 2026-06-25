@@ -20,7 +20,7 @@ public unsafe class TypstCompiler : IDisposable
         return ptr;
     }
 
-    public TypstCompiler(string input, Fonts? fonts = null, Dictionary<string, string>? sysInputs = null)
+    public TypstCompiler(string input, Fonts? fonts = null, Dictionary<string, string>? sysInputs = null, string? root = null)
     {
         fonts ??= new Fonts();
         var fontPaths = fonts.FontPaths ?? Enumerable.Empty<string>();
@@ -38,11 +38,13 @@ public unsafe class TypstCompiler : IDisposable
         var sysInputsJson = JsonSerializer.Serialize(sysInputs ?? new Dictionary<string, string>());
         var sysInputsPtr = StringToHGlobalUtf8(sysInputsJson);
 
+        var rootPtr = root != null ? StringToHGlobalUtf8(root) : IntPtr.Zero;
+
         try
         {
             fixed (IntPtr* fontPathsRawPtr = fontPathPtrs)
             {
-                _compiler = CsBindgen.NativeMethods.create_compiler((byte*)inputPtr, (byte**)fontPathsRawPtr, (nuint)fontPathsList.Count, (byte*)sysInputsPtr, ignoreSystemFonts);
+                _compiler = CsBindgen.NativeMethods.create_compiler((byte*)inputPtr, (byte**)fontPathsRawPtr, (nuint)fontPathsList.Count, (byte*)sysInputsPtr, ignoreSystemFonts, (byte*)rootPtr);
             }
 
             if (_compiler == null)
@@ -55,6 +57,7 @@ public unsafe class TypstCompiler : IDisposable
             Marshal.FreeHGlobal(inputPtr);
             foreach (var ptr in fontPathPtrs) Marshal.FreeHGlobal(ptr);
             Marshal.FreeHGlobal(sysInputsPtr);
+            if (rootPtr != IntPtr.Zero) Marshal.FreeHGlobal(rootPtr);
         }
     }
 
