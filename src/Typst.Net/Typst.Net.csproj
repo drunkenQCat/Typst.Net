@@ -8,7 +8,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>Typst.Net</PackageId>
-    <Version>0.1.1-typst0.13.1</Version>
+    <Version>0.1.2-typst0.13.1</Version>
     <Authors>Typst.Net Contributors</Authors>
     <Description>A .NET wrapper for the Typst typesetting system.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>

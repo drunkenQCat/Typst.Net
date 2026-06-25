@@ -10,23 +10,33 @@ public unsafe class TypstCompiler : IDisposable
     private CsBindgen.Compiler* _compiler;
     private bool _disposed = false;
 
+    /// <summary>将字符串编组为 UTF-8 + null 终止的 IntPtr（替代 StringToHGlobalAnsi）。</summary>
+    private static IntPtr StringToHGlobalUtf8(string s)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(s);
+        var ptr = Marshal.AllocHGlobal(bytes.Length + 1);
+        Marshal.Copy(bytes, 0, ptr, bytes.Length);
+        Marshal.WriteByte(ptr, bytes.Length, 0); // null terminator
+        return ptr;
+    }
+
     public TypstCompiler(string input, Fonts? fonts = null, Dictionary<string, string>? sysInputs = null)
     {
         fonts ??= new Fonts();
         var fontPaths = fonts.FontPaths ?? Enumerable.Empty<string>();
         bool ignoreSystemFonts = !fonts.IncludeSystemFonts;
 
-        var inputPtr = Marshal.StringToHGlobalAnsi(input);
+        var inputPtr = StringToHGlobalUtf8(input);
 
         var fontPathsList = fontPaths.ToList();
         var fontPathPtrs = new IntPtr[fontPathsList.Count];
         for (int i = 0; i < fontPathsList.Count; i++)
         {
-            fontPathPtrs[i] = Marshal.StringToHGlobalAnsi(fontPathsList[i]);
+            fontPathPtrs[i] = StringToHGlobalUtf8(fontPathsList[i]);
         }
 
         var sysInputsJson = JsonSerializer.Serialize(sysInputs ?? new Dictionary<string, string>());
-        var sysInputsPtr = Marshal.StringToHGlobalAnsi(sysInputsJson);
+        var sysInputsPtr = StringToHGlobalUtf8(sysInputsJson);
 
         try
         {
@@ -52,7 +62,7 @@ public unsafe class TypstCompiler : IDisposable
     {
         if (_disposed) throw new ObjectDisposedException(nameof(TypstCompiler));
 
-        var formatPtr = Marshal.StringToHGlobalAnsi(format);
+        var formatPtr = StringToHGlobalUtf8(format);
         try
         {
             var result = CsBindgen.NativeMethods.compile(_compiler, (byte*)formatPtr, ppi);
@@ -114,8 +124,8 @@ public unsafe class TypstCompiler : IDisposable
     {
         if (_disposed) throw new ObjectDisposedException(nameof(TypstCompiler));
 
-        var selectorPtr = Marshal.StringToHGlobalAnsi(selector);
-        var fieldPtr = field == null ? IntPtr.Zero : Marshal.StringToHGlobalAnsi(field);
+        var selectorPtr = StringToHGlobalUtf8(selector);
+        var fieldPtr = field == null ? IntPtr.Zero : StringToHGlobalUtf8(field);
         try
         {
             var resultPtr = CsBindgen.NativeMethods.query(_compiler, (byte*)selectorPtr, (byte*)fieldPtr, one);
