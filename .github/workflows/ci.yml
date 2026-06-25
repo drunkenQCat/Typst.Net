@@ -92,11 +92,10 @@ jobs:
       - name: Pack
         working-directory: src/Typst.Net
         run: |
-          $packArgs = "-c Release -o ../../nupkg /p:SkipRustBuild=true"
           if ("${{ steps.version.outputs.version }}" -ne "") {
-            dotnet pack $packArgs /p:Version=${{ steps.version.outputs.version }}
+            dotnet pack -c Release -o ../../nupkg /p:SkipRustBuild=true /p:Version=${{ steps.version.outputs.version }}
           } else {
-            dotnet pack $packArgs
+            dotnet pack -c Release -o ../../nupkg /p:SkipRustBuild=true
           }
         shell: pwsh
 
